@@ -48,3 +48,11 @@ class IsFinance(HasRole):
     def has_permission(self, request, view):
         view.allowed_roles = {Role.FINANCE_ADMIN, Role.COMPANY_ADMIN}
         return super().has_permission(request, view)
+
+
+class IsExport(HasRole):
+    """Setup/Export endpoints — Company Admin (Setup/Export) + Super Admin."""
+
+    def has_permission(self, request, view):
+        view.allowed_roles = {Role.COMPANY_ADMIN}
+        return super().has_permission(request, view)
