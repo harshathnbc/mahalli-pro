@@ -32,3 +32,19 @@ class IsProcurement(HasRole):
     def has_permission(self, request, view):
         view.allowed_roles = {Role.PROCUREMENT_ADMIN, Role.COMPANY_ADMIN}
         return super().has_permission(request, view)
+
+
+class IsHR(HasRole):
+    """Section 3/6 endpoints (HR Admin + Super/Company Admin)."""
+
+    def has_permission(self, request, view):
+        view.allowed_roles = {Role.HR_ADMIN, Role.COMPANY_ADMIN}
+        return super().has_permission(request, view)
+
+
+class IsFinance(HasRole):
+    """Appendix A / Section 7 endpoints (Finance Admin + Super/Company Admin)."""
+
+    def has_permission(self, request, view):
+        view.allowed_roles = {Role.FINANCE_ADMIN, Role.COMPANY_ADMIN}
+        return super().has_permission(request, view)
