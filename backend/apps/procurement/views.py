@@ -90,6 +90,15 @@ class VendorCertificateViewSet(TenantScopedViewSet):
     queryset = VendorLcgpaCertificate.objects.all()
 
     @action(detail=True, methods=["post"])
+    def parse(self, request, pk=None):
+        """OCR the certificate via Document AI, then auto-enrich the Global Whitelist."""
+        cert = self.get_object()
+        from apps.procurement.tasks import parse_vendor_certificate
+
+        parse_vendor_certificate.delay(str(cert.id))
+        return Response({"status": "PARSING"}, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=["post"])
     def push_to_whitelist(self, request, pk=None):
         """After OCR parsing, push the verified cert to the Global Whitelist."""
         cert = self.get_object()

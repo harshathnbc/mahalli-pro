@@ -23,4 +23,5 @@ urlpatterns = [
     path("api/capex/", include("apps.capex.urls")),
     path("api/assets/", include("apps.assets.urls")),
     path("api/reports/", include("apps.reports.urls")),
+    path("api/copilot/", include("apps.copilot.urls")),
 ]
