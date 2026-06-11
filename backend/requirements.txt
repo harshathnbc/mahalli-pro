@@ -1,0 +1,40 @@
+# --- Core ---
+Django==5.1.4
+djangorestframework==3.15.2
+django-environ==0.11.2
+psycopg[binary]==3.2.3
+
+# --- Auth / API ---
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.6.0
+
+# --- Async / tasks ---
+celery==5.4.0
+redis==5.2.1
+
+# --- Tenancy / security ---
+# Field-level AES-256-GCM encryption for financial/payroll columns.
+cryptography==44.0.0
+
+# --- Vector search (RAG / Module 9) ---
+pgvector==0.3.6
+
+# --- File parsing (Excel/PDF) ---
+openpyxl==3.1.5
+pandas==2.2.3
+pypdf==5.1.0
+
+# --- Object storage (DO Spaces / GCS) ---
+django-storages==1.14.4
+boto3==1.35.80
+
+# --- Google Cloud (Vertex AI + Document AI, me-central2) ---
+google-cloud-aiplatform==1.74.0
+google-cloud-documentai==3.2.0
+
+# --- Server ---
+gunicorn==23.0.0
+whitenoise==6.8.2
+
+# --- Dev / quality ---
+ruff==0.8.4

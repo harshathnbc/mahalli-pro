@@ -1,0 +1,67 @@
+# Phase 0 local/dev stack. Postgres carries pgvector + pg_trgm + pgcrypto.
+# NOTE: dev/synthetic data only — not PDPL-compliant (no in-Kingdom region).
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: mahalli
+      POSTGRES_USER: mahalli_admin
+      POSTGRES_PASSWORD: admin_pw
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mahalli_admin -d mahalli"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    env_file: ../backend/.env
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    command: celery -A config worker -l info
+    env_file: ../backend/.env
+    depends_on:
+      - db
+      - redis
+
+  beat:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    command: celery -A config beat -l info
+    env_file: ../backend/.env
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.frontend
+    command: npm run dev
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+    ports: ["3000:3000"]
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
