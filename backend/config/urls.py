@@ -28,4 +28,5 @@ urlpatterns = [
     path("api/assets/", include("apps.assets.urls")),
     path("api/reports/", include("apps.reports.urls")),
     path("api/copilot/", include("apps.copilot.urls")),
+    path("api/integrations/", include("apps.integrations.urls")),
 ]
