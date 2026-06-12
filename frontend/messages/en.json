@@ -1,7 +1,29 @@
 {
   "brand": "Mahalli Pro",
   "tagline": "Automate your LCGPA Local Content certification",
-  "nav": { "login": "Log in", "switchLang": "العربية" },
+  "nav": {
+    "login": "Log in",
+    "logout": "Log out",
+    "switchLang": "العربية",
+    "overview": "Overview",
+    "hr": "HR & Labor",
+    "procurement": "Procurement",
+    "finance": "Finance",
+    "reports": "Reports & Export",
+    "copilot": "Copilot"
+  },
+  "roles": {
+    "MASTER_ADMIN": "Master Admin",
+    "SUPER_ADMIN": "Company Super Admin",
+    "COMPANY_ADMIN": "Company Admin",
+    "HR_ADMIN": "HR Admin",
+    "PROCUREMENT_ADMIN": "Procurement Admin",
+    "FINANCE_ADMIN": "Finance Admin"
+  },
+  "dashboard": {
+    "welcome": "Your LCGPA compliance workspace.",
+    "go": "Open module →"
+  },
   "landing": {
     "heading": "LCGPA certification, on autopilot",
     "subheading": "Multi-tenant compliance for Saudi Local Content — HR, Procurement, Finance, and Assets reconciled to a single certified score.",
