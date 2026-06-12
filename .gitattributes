@@ -1,0 +1,13 @@
+# Normalize line endings. Shell scripts MUST be LF or they break in Linux containers.
+* text=auto eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Treat the official LCGPA workbooks / PDFs as binary (never line-ending munged).
+*.xlsx binary
+*.xlsm binary
+*.pdf binary
+*.docx binary
+*.png binary
+*.jpg binary
+*.ico binary
