@@ -10,6 +10,16 @@ from rest_framework.permissions import BasePermission
 from apps.accounts.models import Role
 
 
+class IsMasterAdmin(BasePermission):
+    """Tier 1 — platform owner only (no tenant). Operates across all tenants."""
+
+    message = "Master Admin access required."
+
+    def has_permission(self, request, view):
+        user = request.user
+        return bool(user and user.is_authenticated and user.role == Role.MASTER_ADMIN)
+
+
 class HasRole(BasePermission):
     """Grant access if the user's role is in the view's `allowed_roles` set.
 

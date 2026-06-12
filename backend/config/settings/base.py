@@ -89,7 +89,13 @@ DATABASES = {
     "default": env.db("DATABASE_URL", default="postgres://mahalli_app:app_pw@localhost:5432/mahalli"),
 }
 # Optional privileged connection (RLS bypass) for the Master Admin control center.
+# When configured, master-plane querysets run on this alias to read across tenants.
 ADMIN_DATABASE_URL = env("DATABASE_URL_ADMIN", default=None)
+if ADMIN_DATABASE_URL:
+    DATABASES["admin"] = env.db("DATABASE_URL_ADMIN")
+    MASTER_DB_ALIAS = "admin"
+else:
+    MASTER_DB_ALIAS = "default"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
