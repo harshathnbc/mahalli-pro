@@ -1,6 +1,8 @@
 FROM python:3.12-slim
 
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.prod \
+    LCGPA_SOURCE_DIR=/seed/lcgpa
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -10,7 +12,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/ .
+COPY backend/ /app
+# Bake the official LCGPA workbooks into the image so `seed_lcgpa` works on deploy.
+COPY docs/lcgpa /seed/lcgpa
+COPY infra/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Collect static for WhiteNoise (dummy key + local storage just for the build step).
+RUN DJANGO_SECRET_KEY=build FIELD_ENCRYPTION_KEY=ZHVtbXktMzItYnl0ZS1rZXktZm9yLWJ1aWxkLXN0ZXBfXw== \
+    STORAGE_BACKEND=local DATABASE_URL=postgres://u:p@localhost/db \
+    python manage.py collectstatic --noinput || true
 
 EXPOSE 8000
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["/entrypoint.sh"]

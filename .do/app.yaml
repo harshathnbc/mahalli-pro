@@ -1,0 +1,75 @@
+# DigitalOcean App Platform spec for the Mahalli Pro backend.
+# Import via: Apps → Create → "Import from App Spec", or `doctl apps create --spec .do/app.yaml`.
+# Set SECRET-typed values in the dashboard after import (never commit secrets).
+name: mahalli-pro-api
+region: fra   # Frankfurt (closest dev region; move to in-Kingdom for production/PDPL)
+
+services:
+  - name: api
+    dockerfile_path: infra/Dockerfile.backend
+    source_dir: /
+    github:
+      repo: harshathnbc/mahalli-pro
+      branch: main
+      deploy_on_push: true
+    http_port: 8000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    health_check:
+      http_path: /healthz
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DJANGO_SECRET_KEY
+        type: SECRET
+        value: CHANGE_ME
+      - key: FIELD_ENCRYPTION_KEY
+        type: SECRET
+        value: CHANGE_ME    # python -c "import os,base64;print(base64.urlsafe_b64encode(os.urandom(32)).decode())"
+      # Dev-stage: "*" avoids health-check host-validation failures. Tighten to
+      # api.mahallipro.com,.ondigitalocean.app before production.
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "*"
+      # App Platform terminates TLS at the edge; internal health checks are plain
+      # HTTP, so disable the app-level HTTPS redirect to avoid a health-check loop.
+      - key: SECURE_SSL_REDIRECT
+        value: "False"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://api.mahallipro.com,https://mahallipro.com,https://www.mahallipro.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://mahallipro.com,https://www.mahallipro.com
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+      - key: CELERY_TASK_ALWAYS_EAGER
+        value: "True"
+      - key: RUN_SEED
+        value: "1"
+      - key: STORAGE_BACKEND
+        value: s3
+      - key: STORAGE_BUCKET
+        value: mahalli-dev
+      - key: STORAGE_ENDPOINT_URL
+        value: https://fra1.digitaloceanspaces.com
+      - key: STORAGE_REGION
+        value: fra1
+      - key: STORAGE_ACCESS_KEY
+        type: SECRET
+        value: CHANGE_ME
+      - key: STORAGE_SECRET_KEY
+        type: SECRET
+        value: CHANGE_ME
+      # --- Optional: Vertex AI / Document AI (leave unset until you add GCP creds) ---
+      - key: GCP_PROJECT_ID
+        value: ""
+      - key: GCP_LOCATION
+        value: me-central2
+
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    # Use a managed Postgres cluster (not the trial dev DB) so pgvector is available.
+
+domains:
+  - domain: api.mahallipro.com
+    type: PRIMARY

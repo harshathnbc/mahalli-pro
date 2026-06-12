@@ -83,8 +83,14 @@ class Command(BaseCommand):
     help = "Seed IsicSector, EtimadCommodity, MandatoryMinThreshold, GlobalWhitelist from LCGPA xlsx."
 
     def add_arguments(self, parser):
-        default_dir = (Path(settings.BASE_DIR).parent / "docs" / "lcgpa")
-        parser.add_argument("--source-dir", default=str(default_dir))
+        # In the container image the seed files are baked in at LCGPA_SOURCE_DIR;
+        # locally they default to the repo's docs/lcgpa.
+        import os
+
+        default_dir = os.environ.get(
+            "LCGPA_SOURCE_DIR", str(Path(settings.BASE_DIR).parent / "docs" / "lcgpa")
+        )
+        parser.add_argument("--source-dir", default=default_dir)
 
     def handle(self, *args, **opts):
         src = Path(opts["source_dir"])
