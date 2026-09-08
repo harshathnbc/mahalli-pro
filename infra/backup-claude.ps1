@@ -11,7 +11,10 @@ param(
     [string]   $Dest         = (Join-Path $env:OneDrive 'Backups\Claude'),
     [string]   $LogDir       = (Join-Path $env:LOCALAPPDATA 'ClaudeBackup'),
     [string[]] $ExcludeDirs  = @('node_modules', '.venv', '.next', '__pycache__', '.pytest_cache'),
-    [string[]] $ExcludeFiles = @('*.pyc', 'Thumbs.db', 'desktop.ini')
+    [string[]] $ExcludeFiles = @('*.pyc', 'Thumbs.db', 'desktop.ini',
+                                 # secrets: regenerable via `vercel env pull`, and the
+                                 # destination is company-tenant OneDrive
+                                 '.env.local', '.env.*.local')
 )
 
 $ErrorActionPreference = 'Stop'
